@@ -32,10 +32,10 @@ initialModel =
 
 initialEntries : List Entry
 initialEntries =
-    [ Entry 1 "Future-Proof" 100 False
-    , Entry 2 "Doing Agile" 200 False
+    [ Entry 4 "Rock-Star Ninja" 400 False
+    , Entry 1 "Future-Proof" 100 False
     , Entry 3 "In The Cloud" 300 False
-    , Entry 4 "Rock-Star Ninja" 400 False
+    , Entry 2 "Doing Agile" 200 False
     ]
 
 -- UPDATE
@@ -43,6 +43,7 @@ initialEntries =
 type Msg =
     NewGame
     | Mark Int
+    | Sort
     -- | ShareScore
 
 
@@ -61,7 +62,8 @@ update  msg model =
                         e
             in
                 { model | entries = List.map markEntry model.entries }
-
+        Sort ->
+            { model | entries = List.sortBy .points model.entries}
 
 -- VIEW
 

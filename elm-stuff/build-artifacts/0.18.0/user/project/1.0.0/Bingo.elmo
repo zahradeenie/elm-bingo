@@ -76,16 +76,16 @@ var _user$project$Bingo$Entry = F4(
 	});
 var _user$project$Bingo$initialEntries = {
 	ctor: '::',
-	_0: A4(_user$project$Bingo$Entry, 1, 'Future-Proof', 100, false),
+	_0: A4(_user$project$Bingo$Entry, 4, 'Rock-Star Ninja', 400, false),
 	_1: {
 		ctor: '::',
-		_0: A4(_user$project$Bingo$Entry, 2, 'Doing Agile', 200, false),
+		_0: A4(_user$project$Bingo$Entry, 1, 'Future-Proof', 100, false),
 		_1: {
 			ctor: '::',
 			_0: A4(_user$project$Bingo$Entry, 3, 'In The Cloud', 300, false),
 			_1: {
 				ctor: '::',
-				_0: A4(_user$project$Bingo$Entry, 4, 'Rock-Star Ninja', 400, false),
+				_0: A4(_user$project$Bingo$Entry, 2, 'Doing Agile', 200, false),
 				_1: {ctor: '[]'}
 			}
 		}
@@ -95,23 +95,36 @@ var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _
 var _user$project$Bingo$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'NewGame') {
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{gameNumber: model.gameNumber + 1, entries: _user$project$Bingo$initialEntries});
-		} else {
-			var markEntry = function (e) {
-				return _elm_lang$core$Native_Utils.eq(e.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
-					e,
-					{marked: !e.marked}) : e;
-			};
-			return _elm_lang$core$Native_Utils.update(
-				model,
-				{
-					entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
-				});
+		switch (_p0.ctor) {
+			case 'NewGame':
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{gameNumber: model.gameNumber + 1, entries: _user$project$Bingo$initialEntries});
+			case 'Mark':
+				var markEntry = function (e) {
+					return _elm_lang$core$Native_Utils.eq(e.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
+						e,
+						{marked: !e.marked}) : e;
+				};
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
+					});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						entries: A2(
+							_elm_lang$core$List$sortBy,
+							function (_) {
+								return _.points;
+							},
+							model.entries)
+					});
 		}
 	});
+var _user$project$Bingo$Sort = {ctor: 'Sort'};
 var _user$project$Bingo$Mark = function (a) {
 	return {ctor: 'Mark', _0: a};
 };
