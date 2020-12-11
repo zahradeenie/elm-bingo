@@ -3,6 +3,22 @@ module Bingo exposing (..)
 import Html as H
 import Html.Attributes as HA
 
+
+-- MODEL
+
+initialModel =
+    { name = "Zahra"
+    , gameNumber = 1
+    , entries = initialEntries
+    }
+
+initialEntries =
+    [ { id = 1, phrase= "Future-Proof", points = 100, marked = False }
+    , { id = 1, phrase= "Doing Agile", points = 200, marked = False }
+    ]
+
+-- VIEW
+
 playerInfo : String -> Int -> String
 playerInfo name gameNumber =
     name ++ " - Game #" ++ (toString gameNumber)
@@ -30,15 +46,17 @@ viewFooter =
     H.footer []
         [ H.a [ HA.href "https://github.com/zahradeenie" ] [ H.text "Made by Zahra" ] ]
 
-view : H.Html msg
-view =
+
+-- view : H.Html msg
+view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
-        , viewPlayer "Zahra" 3
+        , viewPlayer model.name model.gameNumber
+        , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
         ]
 
 
 main : H.Html msg
 main = 
-    view
+    view initialModel
