@@ -6,15 +6,35 @@ import Html.Attributes as HA
 
 -- MODEL
 
+type alias Model =
+    { name : String
+    , gameNumber : Int
+    , entries : List Entry
+    }
+
+
+type alias Entry = 
+    { id : Int
+    , phrase : String
+    , points : Int
+    , marked : Bool
+    }
+
+
+initialModel : Model
 initialModel =
     { name = "Zahra"
     , gameNumber = 1
     , entries = initialEntries
     }
 
+
+initialEntries : List Entry
 initialEntries =
-    [ { id = 1, phrase= "Future-Proof", points = 100, marked = False }
-    , { id = 1, phrase= "Doing Agile", points = 200, marked = False }
+    [ Entry 1 "Future-Proof" 100 False
+    , Entry 2 "Doing Agile" 200 False
+    , Entry 3 "In The Cloud" 300 False
+    , Entry 4 "Rock-Star Ninja" 400 False
     ]
 
 -- VIEW
@@ -47,7 +67,7 @@ viewFooter =
         [ H.a [ HA.href "https://github.com/zahradeenie" ] [ H.text "Made by Zahra" ] ]
 
 
--- view : H.Html msg
+view : Model -> H.Html msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"

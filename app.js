@@ -8251,13 +8251,29 @@ var _user$project$Bingo$view = function (model) {
 			}
 		});
 };
+var _user$project$Bingo$Model = F3(
+	function (a, b, c) {
+		return {name: a, gameNumber: b, entries: c};
+	});
+var _user$project$Bingo$Entry = F4(
+	function (a, b, c, d) {
+		return {id: a, phrase: b, points: c, marked: d};
+	});
 var _user$project$Bingo$initialEntries = {
 	ctor: '::',
-	_0: {id: 1, phrase: 'Future-Proof', points: 100, marked: false},
+	_0: A4(_user$project$Bingo$Entry, 1, 'Future-Proof', 100, false),
 	_1: {
 		ctor: '::',
-		_0: {id: 1, phrase: 'Doing Agile', points: 200, marked: false},
-		_1: {ctor: '[]'}
+		_0: A4(_user$project$Bingo$Entry, 2, 'Doing Agile', 200, false),
+		_1: {
+			ctor: '::',
+			_0: A4(_user$project$Bingo$Entry, 3, 'In The Cloud', 300, false),
+			_1: {
+				ctor: '::',
+				_0: A4(_user$project$Bingo$Entry, 4, 'Rock-Star Ninja', 400, false),
+				_1: {ctor: '[]'}
+			}
+		}
 	}
 };
 var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _user$project$Bingo$initialEntries};
