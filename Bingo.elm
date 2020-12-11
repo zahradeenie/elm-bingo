@@ -112,14 +112,32 @@ viewEntryList entries =
         H.ul [] listOfEntries
 
 
+sumMarkedPoints : List Entry -> Int
+sumMarkedPoints entries =
+    entries
+        |> List.filter .marked
+        |> List.map .points
+        |> List.sum
+
+
+viewScore : Int -> H.Html Msg
+viewScore sum =
+    H.div [ HA.class "score" ]
+        [ H.span [ HA.class "label" ] [ H.text "Score" ]
+        , H.span [ HA.class "value" ] [ H.text (toString sum) ]
+        ]
+
+
 view : Model -> H.Html Msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
         , viewEntryList model.entries
+        , viewScore (sumMarkedPoints model.entries)
         , H.div [ HA.class "button-group" ]
-            [ H.button [ onClick NewGame ] [ H.text "New Game" ] ]
+            [ H.button [ onClick NewGame ] [ H.text "New Game" ]
+            , H.button [ onClick Sort ] [ H.text "Sort" ] ]
         , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
         ]
