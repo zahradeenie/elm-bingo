@@ -8260,50 +8260,6 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Bingo$viewEntryItem = function (entry) {
-	return A2(
-		_elm_lang$html$Html$li,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$span,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('phrase'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(entry.phrase),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$span,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('points'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(entry.points)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Bingo$viewEntryList = function (entries) {
-	var listOfEntries = A2(_elm_lang$core$List$map, _user$project$Bingo$viewEntryItem, entries);
-	return A2(
-		_elm_lang$html$Html$ul,
-		{ctor: '[]'},
-		listOfEntries);
-};
 var _user$project$Bingo$viewFooter = A2(
 	_elm_lang$html$Html$footer,
 	{ctor: '[]'},
@@ -8372,13 +8328,6 @@ var _user$project$Bingo$viewPlayer = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$Bingo$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{gameNumber: model.gameNumber + 1});
-	});
 var _user$project$Bingo$Model = F3(
 	function (a, b, c) {
 		return {name: a, gameNumber: b, entries: c};
@@ -8405,6 +8354,87 @@ var _user$project$Bingo$initialEntries = {
 	}
 };
 var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _user$project$Bingo$initialEntries};
+var _user$project$Bingo$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'NewGame') {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{gameNumber: model.gameNumber + 1, entries: _user$project$Bingo$initialEntries});
+		} else {
+			var markEntry = function (e) {
+				return _elm_lang$core$Native_Utils.eq(e.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
+					e,
+					{marked: !e.marked}) : e;
+			};
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{
+					entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
+				});
+		}
+	});
+var _user$project$Bingo$Mark = function (a) {
+	return {ctor: 'Mark', _0: a};
+};
+var _user$project$Bingo$viewEntryItem = function (entry) {
+	return A2(
+		_elm_lang$html$Html$li,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'marked', _1: entry.marked},
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(
+					_user$project$Bingo$Mark(entry.id)),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('phrase'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(entry.phrase),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('points'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(entry.points)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Bingo$viewEntryList = function (entries) {
+	var listOfEntries = A2(_elm_lang$core$List$map, _user$project$Bingo$viewEntryItem, entries);
+	return A2(
+		_elm_lang$html$Html$ul,
+		{ctor: '[]'},
+		listOfEntries);
+};
 var _user$project$Bingo$NewGame = {ctor: 'NewGame'};
 var _user$project$Bingo$view = function (model) {
 	return A2(

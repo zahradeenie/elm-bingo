@@ -42,7 +42,7 @@ initialEntries =
 
 type Msg =
     NewGame
-    -- | Mark
+    | Mark Int
     -- | ShareScore
 
 
@@ -50,7 +50,18 @@ update : Msg -> Model -> Model
 update  msg model =
     case msg of
         NewGame ->
-            { model | gameNumber = model.gameNumber + 1 }
+            { model | gameNumber = model.gameNumber + 1,
+                entries = initialEntries }
+        Mark id ->
+            let
+                markEntry e =
+                    if e.id == id then
+                        { e | marked = (not e.marked) }
+                    else
+                        e
+            in
+                { model | entries = List.map markEntry model.entries }
+
 
 -- VIEW
 
@@ -84,7 +95,7 @@ viewFooter =
 
 viewEntryItem : Entry -> H.Html Msg
 viewEntryItem entry =
-    H.li []
+    H.li [ HA.classList [ ("marked", entry.marked) ], onClick (Mark entry.id) ]
         [ H.span [ HA.class "phrase"] [ H.text entry.phrase ]
         , H.span [ HA.class "points" ] [ H.text (toString entry.points) ]
         ]
