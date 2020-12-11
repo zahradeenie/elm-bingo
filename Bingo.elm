@@ -67,11 +67,29 @@ viewFooter =
         [ H.a [ HA.href "https://github.com/zahradeenie" ] [ H.text "Made by Zahra" ] ]
 
 
+viewEntryItem : Entry -> H.Html msg
+viewEntryItem entry =
+    H.li []
+        [ H.span [ HA.class "phrase"] [ H.text entry.phrase ]
+        , H.span [ HA.class "points" ] [ H.text (toString entry.points) ]
+        ]
+
+
+viewEntryList : List Entry -> H.Html msg
+viewEntryList entries =
+    let
+        listOfEntries =
+            List.map viewEntryItem entries
+    in
+        H.ul [] listOfEntries
+
+
 view : Model -> H.Html msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
+        , viewEntryList model.entries
         , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
         ]
