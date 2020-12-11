@@ -110,48 +110,13 @@ var _user$project$Bingo$viewPlayer = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$Bingo$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('content'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _user$project$Bingo$viewHeader('Buzzword Bingo'),
-			_1: {
-				ctor: '::',
-				_0: A2(_user$project$Bingo$viewPlayer, model.name, model.gameNumber),
-				_1: {
-					ctor: '::',
-					_0: _user$project$Bingo$viewEntryList(model.entries),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('debug'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(model)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _user$project$Bingo$viewFooter,
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		});
-};
+var _user$project$Bingo$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{gameNumber: model.gameNumber + 1});
+	});
 var _user$project$Bingo$Model = F3(
 	function (a, b, c) {
 		return {name: a, gameNumber: b, entries: c};
@@ -178,5 +143,74 @@ var _user$project$Bingo$initialEntries = {
 	}
 };
 var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _user$project$Bingo$initialEntries};
-var _user$project$Bingo$main = _elm_lang$virtual_dom$Native_VirtualDom.staticProgram(
-	_user$project$Bingo$view(_user$project$Bingo$initialModel));
+var _user$project$Bingo$NewGame = {ctor: 'NewGame'};
+var _user$project$Bingo$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('content'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$Bingo$viewHeader('Buzzword Bingo'),
+			_1: {
+				ctor: '::',
+				_0: A2(_user$project$Bingo$viewPlayer, model.name, model.gameNumber),
+				_1: {
+					ctor: '::',
+					_0: _user$project$Bingo$viewEntryList(model.entries),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('button-group'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$NewGame),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('New Game'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('debug'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Basics$toString(model)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: _user$project$Bingo$viewFooter,
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Bingo$main = _elm_lang$html$Html$beginnerProgram(
+	{model: _user$project$Bingo$initialModel, view: _user$project$Bingo$view, update: _user$project$Bingo$update})();

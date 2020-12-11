@@ -2,6 +2,7 @@ module Bingo exposing (..)
 
 import Html as H
 import Html.Attributes as HA
+import Html.Events exposing (onClick)
 
 
 -- MODEL
@@ -37,6 +38,20 @@ initialEntries =
     , Entry 4 "Rock-Star Ninja" 400 False
     ]
 
+-- UPDATE
+
+type Msg =
+    NewGame
+    -- | Mark
+    -- | ShareScore
+
+
+update : Msg -> Model -> Model
+update  msg model =
+    case msg of
+        NewGame ->
+            { model | gameNumber = model.gameNumber + 1 }
+
 -- VIEW
 
 playerInfo : String -> Int -> String
@@ -44,7 +59,7 @@ playerInfo name gameNumber =
     name ++ " - Game #" ++ (toString gameNumber)
 
 
-viewPlayer : String -> Int -> H.Html msg
+viewPlayer : String -> Int -> H.Html Msg
 viewPlayer name gameNumber =
     let
         playerInfoText =
@@ -55,19 +70,19 @@ viewPlayer name gameNumber =
         H.h2 [ HA.id "info", HA.class "classy" ] [ playerInfoText ]
 
 
-viewHeader : String -> H.Html msg
+viewHeader : String -> H.Html Msg
 viewHeader title =
     H.header []
         [ H.h1 [] [ H.text title ] ]
 
 
-viewFooter : H.Html msg
+viewFooter : H.Html Msg
 viewFooter =
     H.footer []
         [ H.a [ HA.href "https://github.com/zahradeenie" ] [ H.text "Made by Zahra" ] ]
 
 
-viewEntryItem : Entry -> H.Html msg
+viewEntryItem : Entry -> H.Html Msg
 viewEntryItem entry =
     H.li []
         [ H.span [ HA.class "phrase"] [ H.text entry.phrase ]
@@ -75,7 +90,7 @@ viewEntryItem entry =
         ]
 
 
-viewEntryList : List Entry -> H.Html msg
+viewEntryList : List Entry -> H.Html Msg
 viewEntryList entries =
     let
         listOfEntries =
@@ -84,17 +99,27 @@ viewEntryList entries =
         H.ul [] listOfEntries
 
 
-view : Model -> H.Html msg
+view : Model -> H.Html Msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
         , viewEntryList model.entries
+        , H.div [ HA.class "button-group" ]
+            [ H.button [ onClick NewGame ] [ H.text "New Game" ] ]
         , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
         ]
 
 
-main : H.Html msg
-main = 
-    view initialModel
+-- main : H.Html Msg
+-- main = 
+--     view initialModel
+
+main : Program Never Model Msg
+main =
+    H.beginnerProgram
+        { model = initialModel
+        , view = view
+        , update = update
+        }
