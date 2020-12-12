@@ -147,36 +147,63 @@ var _user$project$Bingo$initialEntries = {
 	}
 };
 var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _user$project$Bingo$initialEntries};
+var _user$project$Bingo$NewRandom = function (a) {
+	return {ctor: 'NewRandom', _0: a};
+};
+var _user$project$Bingo$generateRandomNumber = A2(
+	_elm_lang$core$Random$generate,
+	_user$project$Bingo$NewRandom,
+	A2(_elm_lang$core$Random$int, 1, 100));
 var _user$project$Bingo$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'NewGame':
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{gameNumber: model.gameNumber + 1, entries: _user$project$Bingo$initialEntries});
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{entries: _user$project$Bingo$initialEntries}),
+					_1: _user$project$Bingo$generateRandomNumber
+				};
 			case 'Mark':
 				var markEntry = function (e) {
 					return _elm_lang$core$Native_Utils.eq(e.id, _p0._0) ? _elm_lang$core$Native_Utils.update(
 						e,
 						{marked: !e.marked}) : e;
 				};
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
-					});
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Sort':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							entries: A2(
+								_elm_lang$core$List$sortBy,
+								function (_) {
+									return _.points;
+								},
+								model.entries)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						entries: A2(
-							_elm_lang$core$List$sortBy,
-							function (_) {
-								return _.points;
-							},
-							model.entries)
-					});
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{gameNumber: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$Bingo$Sort = {ctor: 'Sort'};
@@ -330,5 +357,12 @@ var _user$project$Bingo$view = function (model) {
 			}
 		});
 };
-var _user$project$Bingo$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _user$project$Bingo$initialModel, view: _user$project$Bingo$view, update: _user$project$Bingo$update})();
+var _user$project$Bingo$main = _elm_lang$html$Html$program(
+	{
+		init: {ctor: '_Tuple2', _0: _user$project$Bingo$initialModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: _user$project$Bingo$view,
+		update: _user$project$Bingo$update,
+		subscriptions: function (_p1) {
+			return _elm_lang$core$Platform_Sub$none;
+		}
+	})();
