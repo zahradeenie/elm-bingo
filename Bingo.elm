@@ -4,6 +4,7 @@ import Html as H
 import Html.Attributes as HA
 import Html.Events exposing (onClick)
 import Random
+import Http
 
 
 -- MODEL
@@ -27,17 +28,9 @@ initialModel : Model
 initialModel =
     { name = "Zahra"
     , gameNumber = 1
-    , entries = initialEntries
+    , entries = []
     }
 
-
-initialEntries : List Entry
-initialEntries =
-    [ Entry 4 "Rock-Star Ninja" 400 False
-    , Entry 1 "Future-Proof" 100 False
-    , Entry 3 "In The Cloud" 300 False
-    , Entry 2 "Doing Agile" 200 False
-    ]
 
 -- UPDATE
 
@@ -45,7 +38,7 @@ type Msg =
     NewGame
     | Mark Int
     | Sort
-    | NewRandom Int
+    | NewEntries (Result Http.Error String)
     -- | ShareScore
 
 
@@ -53,7 +46,8 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update  msg model =
     case msg of
         NewGame ->
-            ( { model | entries = initialEntries }, generateRandomNumber )
+            ( { model | gameNumber = model.gameNumber + 1 }, getEntries )
+
         Mark id ->
             let
                 markEntry e =
@@ -63,17 +57,35 @@ update  msg model =
                         e
             in
                 ( { model | entries = List.map markEntry model.entries }, Cmd.none )
+
         Sort ->
             ( { model | entries = List.sortBy .points model.entries}, Cmd.none )
-        NewRandom randomNumber->
-            ( { model | gameNumber = randomNumber }, Cmd.none )
+
+        NewEntries (Ok jsonString) ->
+            let
+                _ = Debug.log "It worked" jsonString
+            in
+            (model, Cmd.none)
+
+        NewEntries (Err error) ->
+            let
+                _ = Debug.log "It didn't work" error
+            in
+            (model, Cmd.none)
 
 
 -- COMMANDS
 
-generateRandomNumber : Cmd Msg
-generateRandomNumber =
-    Random.generate NewRandom (Random.int 1 100)
+entriesUrl : String
+entriesUrl =
+    "http://localhost:3000/random-entries"
+
+
+getEntries : Cmd Msg
+getEntries =
+    entriesUrl
+    |> Http.getString
+    |> Http.send NewEntries
 
 
 -- VIEW
@@ -161,7 +173,7 @@ view model =
 main : Program Never Model Msg
 main =
     H.program
-        { init = ( initialModel, Cmd.none )
+        { init = ( initialModel, getEntries)
         , view = view
         , update = update
         , subscriptions = (\_ -> Sub.none )

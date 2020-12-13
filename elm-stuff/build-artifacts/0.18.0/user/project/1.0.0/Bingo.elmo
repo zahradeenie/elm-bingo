@@ -121,6 +121,12 @@ var _user$project$Bingo$viewPlayer = F2(
 				_1: {ctor: '[]'}
 			});
 	});
+var _user$project$Bingo$entriesUrl = 'http://localhost:3000/random-entries';
+var _user$project$Bingo$initialModel = {
+	name: 'Zahra',
+	gameNumber: 1,
+	entries: {ctor: '[]'}
+};
 var _user$project$Bingo$Model = F3(
 	function (a, b, c) {
 		return {name: a, gameNumber: b, entries: c};
@@ -129,31 +135,13 @@ var _user$project$Bingo$Entry = F4(
 	function (a, b, c, d) {
 		return {id: a, phrase: b, points: c, marked: d};
 	});
-var _user$project$Bingo$initialEntries = {
-	ctor: '::',
-	_0: A4(_user$project$Bingo$Entry, 4, 'Rock-Star Ninja', 400, false),
-	_1: {
-		ctor: '::',
-		_0: A4(_user$project$Bingo$Entry, 1, 'Future-Proof', 100, false),
-		_1: {
-			ctor: '::',
-			_0: A4(_user$project$Bingo$Entry, 3, 'In The Cloud', 300, false),
-			_1: {
-				ctor: '::',
-				_0: A4(_user$project$Bingo$Entry, 2, 'Doing Agile', 200, false),
-				_1: {ctor: '[]'}
-			}
-		}
-	}
+var _user$project$Bingo$NewEntries = function (a) {
+	return {ctor: 'NewEntries', _0: a};
 };
-var _user$project$Bingo$initialModel = {name: 'Zahra', gameNumber: 1, entries: _user$project$Bingo$initialEntries};
-var _user$project$Bingo$NewRandom = function (a) {
-	return {ctor: 'NewRandom', _0: a};
-};
-var _user$project$Bingo$generateRandomNumber = A2(
-	_elm_lang$core$Random$generate,
-	_user$project$Bingo$NewRandom,
-	A2(_elm_lang$core$Random$int, 1, 100));
+var _user$project$Bingo$getEntries = A2(
+	_elm_lang$http$Http$send,
+	_user$project$Bingo$NewEntries,
+	_elm_lang$http$Http$getString(_user$project$Bingo$entriesUrl));
 var _user$project$Bingo$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
@@ -163,8 +151,8 @@ var _user$project$Bingo$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{entries: _user$project$Bingo$initialEntries}),
-					_1: _user$project$Bingo$generateRandomNumber
+						{gameNumber: model.gameNumber + 1}),
+					_1: _user$project$Bingo$getEntries
 				};
 			case 'Mark':
 				var markEntry = function (e) {
@@ -197,13 +185,13 @@ var _user$project$Bingo$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{gameNumber: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+				if (_p0._0.ctor === 'Ok') {
+					var _p1 = A2(_elm_lang$core$Debug$log, 'It worked', _p0._0._0);
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				} else {
+					var _p2 = A2(_elm_lang$core$Debug$log, 'It didn\'t work', _p0._0._0);
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 		}
 	});
 var _user$project$Bingo$Sort = {ctor: 'Sort'};
@@ -359,10 +347,10 @@ var _user$project$Bingo$view = function (model) {
 };
 var _user$project$Bingo$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$Bingo$initialModel, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$Bingo$initialModel, _1: _user$project$Bingo$getEntries},
 		view: _user$project$Bingo$view,
 		update: _user$project$Bingo$update,
-		subscriptions: function (_p1) {
+		subscriptions: function (_p3) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
