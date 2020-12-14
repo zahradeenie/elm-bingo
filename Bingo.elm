@@ -6,6 +6,7 @@ import Html.Events exposing (onClick)
 import Random
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
+import Json.Encode as Encode
 
 
 -- MODEL
@@ -26,6 +27,12 @@ type alias Entry =
     }
 
 
+type alias Score =
+    { id : Int
+    , name : String
+    , score : Int
+    }
+
 initialModel : Model
 initialModel =
     { name = "Zahra"
@@ -43,7 +50,8 @@ type Msg
     | Sort
     | NewEntries (Result Http.Error (List Entry))
     | CloseAlert
-    -- | ShareScore
+    | ShareScore
+    | NewScore (Result Http.Error Score)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,12 +93,32 @@ update  msg model =
                             (toString error)
             in
             ( { model | alertMessage = Just errorMessage }, Cmd.none)
-        
-        CloseAlert -> 
+
+        CloseAlert ->
             ( { model | alertMessage = Nothing }, Cmd.none)
 
+        ShareScore ->
+            ( model, postScore model )
 
--- DECODERS
+        NewScore (Ok score) ->
+            let
+                message =
+                    "Your score of "
+                        ++ (toString score.score)
+                        ++ " was successfully shared"
+            in
+            ( { model | alertMessage = Just message }, Cmd.none)
+
+        NewScore (Err error) ->
+            let
+                message =
+                    "Error posting your score: "
+                        ++ (toString error)
+            in
+            ( { model | alertMessage = Just message }, Cmd.none)
+
+
+-- DECODERS / ENCODERS
 
 entryDecoder : Decoder Entry
 entryDecoder =
@@ -99,6 +127,22 @@ entryDecoder =
         (field "phrase" Decode.string)
         (field "points" Decode.int)
         (succeed False)
+
+
+scoreDecoder : Decoder Score
+scoreDecoder =
+    Decode.map3 Score
+        (field "id" Decode.int)
+        (field "name" Decode.string)
+        (field "score" Decode.int)
+
+
+encodeScore : Model -> Encode.Value
+encodeScore model =
+    Encode.object
+        [ ("name", Encode.string model.name)
+        , ("score", Encode.int (sumMarkedPoints model.entries))
+        ]
 
 
 -- COMMANDS
@@ -113,6 +157,25 @@ getEntries =
     (Decode.list entryDecoder)
     |> Http.get entriesUrl
     |> Http.send NewEntries
+
+
+postUrl : String
+postUrl =
+    "http://localhost:3000/scores"
+
+
+postScore : Model -> Cmd Msg
+postScore model =
+    let
+        body =
+            encodeScore model
+                |> Http.jsonBody
+
+        request =
+            Http.post postUrl body scoreDecoder
+    in
+        Http.send NewScore request
+
 
 
 -- VIEW
@@ -200,6 +263,7 @@ view model =
         , viewScore (sumMarkedPoints model.entries)
         , H.div [ HA.class "button-group" ]
             [ H.button [ onClick NewGame ] [ H.text "New Game" ]
+            , H.button [ onClick ShareScore ] [ H.text "Share Score" ]
             , H.button [ onClick Sort ] [ H.text "Sort" ] ]
         , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
