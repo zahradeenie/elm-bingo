@@ -14,6 +14,7 @@ type alias Model =
     { name : String
     , gameNumber : Int
     , entries : List Entry
+    , alertMessage : Maybe String
     }
 
 
@@ -30,16 +31,18 @@ initialModel =
     { name = "Zahra"
     , gameNumber = 1
     , entries = []
+    , alertMessage = Nothing
     }
 
 
 -- UPDATE
 
-type Msg =
-    NewGame
+type Msg
+    = NewGame
     | Mark Int
     | Sort
     | NewEntries (Result Http.Error (List Entry))
+    | CloseAlert
     -- | ShareScore
 
 
@@ -66,7 +69,25 @@ update  msg model =
             ( { model | entries = randomEntries }, Cmd.none)
 
         NewEntries (Err error) ->
-            (model, Cmd.none)
+            let
+                errorMessage =
+                    case error of
+                        Http.NetworkError ->
+                            "Server is not running"
+
+                        Http.BadStatus response ->
+                            (toString response.status)
+
+                        Http.BadPayload message _ ->
+                            "Decoding failed: " ++ message
+
+                        _ ->
+                            (toString error)
+            in
+            ( { model | alertMessage = Just errorMessage }, Cmd.none)
+        
+        CloseAlert -> 
+            ( { model | alertMessage = Nothing }, Cmd.none)
 
 
 -- DECODERS
@@ -157,11 +178,24 @@ viewScore sum =
         ]
 
 
+viewAlertMessage : Maybe String -> H.Html Msg
+viewAlertMessage alertMessage =
+    case alertMessage of
+        Just message ->
+            H.div [ HA.class "alert" ]
+                [ H.span [ HA.class "close", onClick CloseAlert ] [ H.text "x"]
+                , H.text message
+                ]
+        Nothing ->
+            H.text ""
+
+
 view : Model -> H.Html Msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
+        , viewAlertMessage model.alertMessage
         , viewEntryList model.entries
         , viewScore (sumMarkedPoints model.entries)
         , H.div [ HA.class "button-group" ]
