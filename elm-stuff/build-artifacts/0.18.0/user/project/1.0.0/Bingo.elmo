@@ -145,14 +145,15 @@ var _user$project$Bingo$encodeScore = function (model) {
 		});
 };
 var _user$project$Bingo$initialModel = {
-	name: 'Zahra',
+	name: 'Anon',
 	gameNumber: 1,
 	entries: {ctor: '[]'},
-	alertMessage: _elm_lang$core$Maybe$Nothing
+	alertMessage: _elm_lang$core$Maybe$Nothing,
+	nameInput: ''
 };
-var _user$project$Bingo$Model = F4(
-	function (a, b, c, d) {
-		return {name: a, gameNumber: b, entries: c, alertMessage: d};
+var _user$project$Bingo$Model = F5(
+	function (a, b, c, d, e) {
+		return {name: a, gameNumber: b, entries: c, alertMessage: d, nameInput: e};
 	});
 var _user$project$Bingo$Entry = F4(
 	function (a, b, c, d) {
@@ -175,6 +176,62 @@ var _user$project$Bingo$scoreDecoder = A4(
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int),
 	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'score', _elm_lang$core$Json_Decode$int));
+var _user$project$Bingo$SaveName = {ctor: 'SaveName'};
+var _user$project$Bingo$SetNameInput = function (a) {
+	return {ctor: 'SetNameInput', _0: a};
+};
+var _user$project$Bingo$viewNameInput = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('name-input'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('text'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$placeholder('Who\'s playing?'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$autofocus(true),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value(model.nameInput),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_user$project$Bingo$SetNameInput),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$SaveName),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Save'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Bingo$NewScore = function (a) {
 	return {ctor: 'NewScore', _0: a};
 };
@@ -324,7 +381,7 @@ var _user$project$Bingo$update = F2(
 					_0: model,
 					_1: _user$project$Bingo$postScore(model)
 				};
-			default:
+			case 'NewScore':
 				if (_p1._0.ctor === 'Ok') {
 					var message = A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -357,6 +414,22 @@ var _user$project$Bingo$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
+			case 'SetNameInput':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{nameInput: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{name: model.nameInput, nameInput: ''}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _user$project$Bingo$Sort = {ctor: 'Sort'};
@@ -441,46 +514,35 @@ var _user$project$Bingo$view = function (model) {
 					_0: _user$project$Bingo$viewAlertMessage(model.alertMessage),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Bingo$viewEntryList(model.entries),
+						_0: _user$project$Bingo$viewNameInput(model),
 						_1: {
 							ctor: '::',
-							_0: _user$project$Bingo$viewScore(
-								_user$project$Bingo$sumMarkedPoints(model.entries)),
+							_0: _user$project$Bingo$viewEntryList(model.entries),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('button-group'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$button,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$NewGame),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('New Game'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
+								_0: _user$project$Bingo$viewScore(
+									_user$project$Bingo$sumMarkedPoints(model.entries)),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('button-group'),
+											_1: {ctor: '[]'}
+										},
+										{
 											ctor: '::',
 											_0: A2(
 												_elm_lang$html$Html$button,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$ShareScore),
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$NewGame),
 													_1: {ctor: '[]'}
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Share Score'),
+													_0: _elm_lang$html$Html$text('New Game'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {
@@ -489,37 +551,52 @@ var _user$project$Bingo$view = function (model) {
 													_elm_lang$html$Html$button,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$Sort),
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$ShareScore),
 														_1: {ctor: '[]'}
 													},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Sort'),
+														_0: _elm_lang$html$Html$text('Share Score'),
 														_1: {ctor: '[]'}
 													}),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$button,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(_user$project$Bingo$Sort),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Sort'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
 											}
-										}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$div,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('debug'),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text(
-												_elm_lang$core$Basics$toString(model)),
-											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Bingo$viewFooter,
-										_1: {ctor: '[]'}
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('debug'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(
+													_elm_lang$core$Basics$toString(model)),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: _user$project$Bingo$viewFooter,
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							}

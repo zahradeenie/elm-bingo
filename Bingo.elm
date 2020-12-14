@@ -2,7 +2,7 @@ module Bingo exposing (..)
 
 import Html as H
 import Html.Attributes as HA
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Random
 import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
@@ -16,6 +16,7 @@ type alias Model =
     , gameNumber : Int
     , entries : List Entry
     , alertMessage : Maybe String
+    , nameInput : String
     }
 
 
@@ -35,10 +36,11 @@ type alias Score =
 
 initialModel : Model
 initialModel =
-    { name = "Zahra"
+    { name = "Anon"
     , gameNumber = 1
     , entries = []
     , alertMessage = Nothing
+    , nameInput = ""
     }
 
 
@@ -52,6 +54,8 @@ type Msg
     | CloseAlert
     | ShareScore
     | NewScore (Result Http.Error Score)
+    | SetNameInput String
+    | SaveName
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -116,6 +120,12 @@ update  msg model =
                         ++ (toString error)
             in
             ( { model | alertMessage = Just message }, Cmd.none)
+
+        SetNameInput value ->
+            ( { model | nameInput = value }, Cmd.none)
+
+        SaveName ->
+            ( { model | name = model.nameInput, nameInput = "" }, Cmd.none )
 
 
 -- DECODERS / ENCODERS
@@ -253,12 +263,28 @@ viewAlertMessage alertMessage =
             H.text ""
 
 
+viewNameInput : Model -> H.Html Msg
+viewNameInput model =
+    H.div [ HA.class "name-input" ]
+        [ H.input
+            [ HA.type_ "text"
+            , HA.placeholder "Who's playing?"
+            , HA.autofocus True
+            , HA.value model.nameInput
+            , onInput SetNameInput
+            ]
+            []
+          , H.button [ onClick SaveName ] [ H.text "Save" ]
+        ]
+
+
 view : Model -> H.Html Msg
 view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
         , viewAlertMessage model.alertMessage
+        , viewNameInput model
         , viewEntryList model.entries
         , viewScore (sumMarkedPoints model.entries)
         , H.div [ HA.class "button-group" ]
