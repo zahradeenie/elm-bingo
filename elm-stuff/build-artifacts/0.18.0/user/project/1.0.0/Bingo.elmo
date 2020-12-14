@@ -135,13 +135,23 @@ var _user$project$Bingo$Entry = F4(
 	function (a, b, c, d) {
 		return {id: a, phrase: b, points: c, marked: d};
 	});
+var _user$project$Bingo$entryDecoder = A5(
+	_elm_lang$core$Json_Decode$map4,
+	_user$project$Bingo$Entry,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'phrase', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'points', _elm_lang$core$Json_Decode$int),
+	_elm_lang$core$Json_Decode$succeed(false));
 var _user$project$Bingo$NewEntries = function (a) {
 	return {ctor: 'NewEntries', _0: a};
 };
 var _user$project$Bingo$getEntries = A2(
 	_elm_lang$http$Http$send,
 	_user$project$Bingo$NewEntries,
-	_elm_lang$http$Http$getString(_user$project$Bingo$entriesUrl));
+	A2(
+		_elm_lang$http$Http$get,
+		_user$project$Bingo$entriesUrl,
+		_elm_lang$core$Json_Decode$list(_user$project$Bingo$entryDecoder)));
 var _user$project$Bingo$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
@@ -186,10 +196,14 @@ var _user$project$Bingo$update = F2(
 				};
 			default:
 				if (_p0._0.ctor === 'Ok') {
-					var _p1 = A2(_elm_lang$core$Debug$log, 'It worked', _p0._0._0);
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{entries: _p0._0._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				} else {
-					var _p2 = A2(_elm_lang$core$Debug$log, 'It didn\'t work', _p0._0._0);
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 		}
@@ -350,7 +364,7 @@ var _user$project$Bingo$main = _elm_lang$html$Html$program(
 		init: {ctor: '_Tuple2', _0: _user$project$Bingo$initialModel, _1: _user$project$Bingo$getEntries},
 		view: _user$project$Bingo$view,
 		update: _user$project$Bingo$update,
-		subscriptions: function (_p3) {
+		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

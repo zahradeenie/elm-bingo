@@ -5,6 +5,7 @@ import Html.Attributes as HA
 import Html.Events exposing (onClick)
 import Random
 import Http
+import Json.Decode as Decode exposing (Decoder, field, succeed)
 
 
 -- MODEL
@@ -38,7 +39,7 @@ type Msg =
     NewGame
     | Mark Int
     | Sort
-    | NewEntries (Result Http.Error String)
+    | NewEntries (Result Http.Error (List Entry))
     -- | ShareScore
 
 
@@ -61,17 +62,22 @@ update  msg model =
         Sort ->
             ( { model | entries = List.sortBy .points model.entries}, Cmd.none )
 
-        NewEntries (Ok jsonString) ->
-            let
-                _ = Debug.log "It worked" jsonString
-            in
-            (model, Cmd.none)
+        NewEntries (Ok randomEntries) ->
+            ( { model | entries = randomEntries }, Cmd.none)
 
         NewEntries (Err error) ->
-            let
-                _ = Debug.log "It didn't work" error
-            in
             (model, Cmd.none)
+
+
+-- DECODERS
+
+entryDecoder : Decoder Entry
+entryDecoder =
+    Decode.map4 Entry
+        (field "id" Decode.int)
+        (field "phrase" Decode.string)
+        (field "points" Decode.int)
+        (succeed False)
 
 
 -- COMMANDS
@@ -83,8 +89,8 @@ entriesUrl =
 
 getEntries : Cmd Msg
 getEntries =
-    entriesUrl
-    |> Http.getString
+    (Decode.list entryDecoder)
+    |> Http.get entriesUrl
     |> Http.send NewEntries
 
 
