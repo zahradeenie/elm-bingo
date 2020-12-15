@@ -9859,7 +9859,7 @@ var _user$project$Bingo$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'SaveName':
-				return {
+				return _elm_lang$core$String$isEmpty(model.nameInput) ? {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none} : {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
