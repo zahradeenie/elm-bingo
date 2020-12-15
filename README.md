@@ -1,8 +1,10 @@
 # Elm Bingo
 
-Elm was never a sexy language to me. To be honest, I found it a bit ugly to look at - from a glance it didn't look appealing so I decided to learn Elixir instead of looking further into Elm and understanding why so many people love it. But I've got around to it now and I'm so glad I did. This repo contains all my notes about Elm as I go through The Pragmatic Studio's [Building Web Apps with Elm](https://pragmaticstudio.com/courses/elm) where I build a game of Bingo while learning core concepts in Elm. 
+Elm was never a sexy language to me. To be honest, I found it a bit ugly to look at - from a glance it didn't look appealing so I decided to learn Elixir instead of looking further into Elm and understanding why so many people love it. But I've got around to it now and I'm so glad I did. This repo contains all my notes about Elm as I go through The Pragmatic Studio's [Building Web Apps with Elm](https://pragmaticstudio.com/courses/elm) where I build a game of Bingo while learning core concepts in Elm. As with my [Elixir Server Readme](https://github.com/zahradeenie/server), this Readme will detail the concepts I've learnt through the course.
 
-## Type System
+## Building blocks of Elm
+
+**Type System**
 
 Elm is a statically typed language. That means it has types. All the types! It's highly recommended you use Type Annotations on your functions so the compiler can be as useful as possible but it's not required. These are a few of the data types in Elm with some handy info:
 
@@ -20,7 +22,7 @@ Elm is a statically typed language. That means it has types. All the types! It's
   * You can store different data types in a record.
   * You can use dot notation to access values of a key or just use a space: `obj.key | obj key`
 
-## Currying
+**Currying**
 
 I didn't really understand currying that well before this but I think I've got a better grasp of it now. All Elm functions take in 1 argument and return 1 result. That result can either be a value or another function. All functions in Elm are curried so you don't need to pass all arguments at once.
 
@@ -34,6 +36,41 @@ pad : Int -> Char -> String -> String
 pad : Int -> (Char -> (String -> String))
 -- This shows it takes an integer as the first argument and returns a function that takes a character as the first argument and so on..
 ```
+
+**Type Alias and Type Annotations**
+
+Type aliases are useful to create if you want to reference a type annotation in more than one place. What's more is that they also double as named functions. If you aliased a record, this becomes a record constructor where you can create a new record by passing in the arguments it takes in. A type annotation defines the data types that a function expects to receive and return.
+
+```elm
+type alias Animal =
+    { name : String
+    , legs : Int
+    , sound : String
+    }
+
+-- Type annotation of this will be
+Animal : String -> Int -> String
+```
+
+## Data Flow
+
+When a user interacts with your application, a message is always produced and sent to the Elm runtime which feeds this into the update function with the current model. The update fun creates a new model with the updated state based on the message that was sent. Th view fun is called with the new model and returns DOM nodes representing HTML which the runtime will render in the browser.
+
+An application's state is stored in the Elm runtime's memory.
+
+## The Elm Architecture
+
+The data flow mentioned above is the pattern known as The ELm Architecture. You have three main components:
+
+1. Model: a record that contains the app's current state
+2. Update: updates the state based on the message from a user event and returns a new model
+3. View: takes a model and returns DOM nodes to be rendered based on the state
+
+These three components are wired together with the Html.beginnerProgram fun which is called from the main fun. The Elm runtime calls the main fun to kick off the application and co-ordinates the data flow. Everything runs through the runtime.
+
+## Effects and Commands
+
+---
 
 ### Useful general knowledge
 
