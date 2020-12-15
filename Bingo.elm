@@ -17,6 +17,7 @@ type alias Model =
     , entries : List Entry
     , alertMessage : Maybe String
     , nameInput : String
+    , gameState : GameState
     }
 
 
@@ -34,6 +35,10 @@ type alias Score =
     , score : Int
     }
 
+type GameState
+    = EnteringName
+    | Playing
+
 initialModel : Model
 initialModel =
     { name = "Anon"
@@ -41,6 +46,7 @@ initialModel =
     , entries = []
     , alertMessage = Nothing
     , nameInput = ""
+    , gameState = EnteringName
     }
 
 
@@ -56,6 +62,7 @@ type Msg
     | NewScore (Result Http.Error Score)
     | SetNameInput String
     | SaveName
+    | ChangeGameState GameState
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -125,7 +132,12 @@ update  msg model =
             ( { model | nameInput = value }, Cmd.none)
 
         SaveName ->
-            ( { model | name = model.nameInput, nameInput = "" }, Cmd.none )
+            ( { model | name = model.nameInput
+                        , nameInput = ""
+                        , gameState = Playing }, Cmd.none )
+
+        ChangeGameState state ->
+            ( { model | gameState = state}, Cmd.none )
 
 
 -- DECODERS / ENCODERS
@@ -190,20 +202,12 @@ postScore model =
 
 -- VIEW
 
-playerInfo : String -> Int -> String
-playerInfo name gameNumber =
-    name ++ " - Game #" ++ (toString gameNumber)
-
-
 viewPlayer : String -> Int -> H.Html Msg
 viewPlayer name gameNumber =
-    let
-        playerInfoText =
-            playerInfo name gameNumber
-                |> String.toUpper
-                |> H.text
-    in
-        H.h2 [ HA.id "info", HA.class "classy" ] [ playerInfoText ]
+    H.h2 [ HA.id "info", HA.class "classy" ]
+        [ H.a [ HA.href "#", onClick (ChangeGameState EnteringName) ] [ H.text name ]
+        , H.text (" - Game #" ++ (toString gameNumber))
+        ]
 
 
 viewHeader : String -> H.Html Msg
@@ -265,17 +269,22 @@ viewAlertMessage alertMessage =
 
 viewNameInput : Model -> H.Html Msg
 viewNameInput model =
-    H.div [ HA.class "name-input" ]
-        [ H.input
-            [ HA.type_ "text"
-            , HA.placeholder "Who's playing?"
-            , HA.autofocus True
-            , HA.value model.nameInput
-            , onInput SetNameInput
-            ]
-            []
-          , H.button [ onClick SaveName ] [ H.text "Save" ]
-        ]
+    case model.gameState of
+        EnteringName ->
+            H.div [ HA.class "name-input" ]
+                [ H.input
+                    [ HA.type_ "text"
+                    , HA.placeholder "Who's playing?"
+                    , HA.autofocus True
+                    , HA.value model.nameInput
+                    , onInput SetNameInput
+                    ]
+                    []
+                  , H.button [ onClick SaveName ] [ H.text "Save" ]
+                ]
+
+        Playing ->
+          H.text ""
 
 
 view : Model -> H.Html Msg
