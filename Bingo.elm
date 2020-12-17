@@ -8,6 +8,7 @@ import Http
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
 
+import ViewHelpers exposing (..)
 
 -- MODEL
 
@@ -88,22 +89,7 @@ update  msg model =
             ( { model | entries = randomEntries }, Cmd.none)
 
         NewEntries (Err error) ->
-            let
-                errorMessage =
-                    case error of
-                        Http.NetworkError ->
-                            "Server is not running"
-
-                        Http.BadStatus response ->
-                            (toString response.status)
-
-                        Http.BadPayload message _ ->
-                            "Decoding failed: " ++ message
-
-                        _ ->
-                            (toString error)
-            in
-            ( { model | alertMessage = Just errorMessage }, Cmd.none)
+            ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none)
 
         CloseAlert ->
             ( { model | alertMessage = Nothing }, Cmd.none)
@@ -121,12 +107,7 @@ update  msg model =
             ( { model | alertMessage = Just message }, Cmd.none)
 
         NewScore (Err error) ->
-            let
-                message =
-                    "Error posting your score: "
-                        ++ (toString error)
-            in
-            ( { model | alertMessage = Just message }, Cmd.none)
+            ( { model | alertMessage = Just (httpErrorToMessage error) }, Cmd.none)
 
         SetNameInput value ->
             ( { model | nameInput = value }, Cmd.none)
@@ -142,6 +123,21 @@ update  msg model =
         ChangeGameState state ->
             ( { model | gameState = state}, Cmd.none )
 
+
+httpErrorToMessage : Http.Error -> String
+httpErrorToMessage error =
+    case error of
+        Http.NetworkError ->
+            "Server is not running"
+
+        Http.BadStatus response ->
+            (toString response.status)
+
+        Http.BadPayload message _ ->
+            "Decoding failed: " ++ message
+
+        _ ->
+            (toString error)
 
 -- DECODERS / ENCODERS
 
@@ -258,18 +254,6 @@ viewScore sum =
         ]
 
 
-viewAlertMessage : Maybe String -> H.Html Msg
-viewAlertMessage alertMessage =
-    case alertMessage of
-        Just message ->
-            H.div [ HA.class "alert" ]
-                [ H.span [ HA.class "close", onClick CloseAlert ] [ H.text "x"]
-                , H.text message
-                ]
-        Nothing ->
-            H.text ""
-
-
 viewNameInput : Model -> H.Html Msg
 viewNameInput model =
     case model.gameState of
@@ -283,7 +267,7 @@ viewNameInput model =
                     , onInput SetNameInput
                     ]
                     []
-                  , H.button [ onClick SaveName ] [ H.text "Save" ]
+                  , primaryButton SaveName "Save"
                 ]
 
         Playing ->
@@ -295,22 +279,18 @@ view model =
     H.div [ HA.class "content" ]
         [ viewHeader "Buzzword Bingo"
         , viewPlayer model.name model.gameNumber
-        , viewAlertMessage model.alertMessage
+        , alert CloseAlert model.alertMessage
         , viewNameInput model
         , viewEntryList model.entries
         , viewScore (sumMarkedPoints model.entries)
         , H.div [ HA.class "button-group" ]
-            [ H.button [ onClick NewGame ] [ H.text "New Game" ]
-            , H.button [ onClick ShareScore ] [ H.text "Share Score" ]
-            , H.button [ onClick Sort ] [ H.text "Sort" ] ]
+            [ primaryButton NewGame "New Game"
+            , primaryButton ShareScore "Share Score"
+            , primaryButton Sort "Sort" ]
         , H.div [ HA.class "debug" ] [ H.text (toString model) ]
         , viewFooter
         ]
 
-
--- main : H.Html Msg
--- main = 
---     view initialModel
 
 main : Program Never Model Msg
 main =
