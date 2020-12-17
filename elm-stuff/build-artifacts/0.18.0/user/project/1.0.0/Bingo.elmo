@@ -90,7 +90,6 @@ var _user$project$Bingo$viewHeader = function (title) {
 		});
 };
 var _user$project$Bingo$postUrl = 'http://localhost:3000/scores';
-var _user$project$Bingo$entriesUrl = 'http://localhost:3000/random-entries';
 var _user$project$Bingo$encodeScore = function (model) {
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -129,17 +128,6 @@ var _user$project$Bingo$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {name: a, gameNumber: b, entries: c, alertMessage: d, nameInput: e, gameState: f};
 	});
-var _user$project$Bingo$Entry = F4(
-	function (a, b, c, d) {
-		return {id: a, phrase: b, points: c, marked: d};
-	});
-var _user$project$Bingo$entryDecoder = A5(
-	_elm_lang$core$Json_Decode$map4,
-	_user$project$Bingo$Entry,
-	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'phrase', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'points', _elm_lang$core$Json_Decode$int),
-	_elm_lang$core$Json_Decode$succeed(false));
 var _user$project$Bingo$Score = F3(
 	function (a, b, c) {
 		return {id: a, name: b, score: c};
@@ -270,13 +258,7 @@ var _user$project$Bingo$CloseAlert = {ctor: 'CloseAlert'};
 var _user$project$Bingo$NewEntries = function (a) {
 	return {ctor: 'NewEntries', _0: a};
 };
-var _user$project$Bingo$getEntries = A2(
-	_elm_lang$http$Http$send,
-	_user$project$Bingo$NewEntries,
-	A2(
-		_elm_lang$http$Http$get,
-		_user$project$Bingo$entriesUrl,
-		_elm_lang$core$Json_Decode$list(_user$project$Bingo$entryDecoder)));
+var _user$project$Bingo$getEntries = A2(_user$project$Entry$getEntries, _user$project$Bingo$NewEntries, 'http://localhost:3000/random-entries');
 var _user$project$Bingo$update = F2(
 	function (msg, model) {
 		var _p2 = msg;
@@ -290,17 +272,12 @@ var _user$project$Bingo$update = F2(
 					_1: _user$project$Bingo$getEntries
 				};
 			case 'Mark':
-				var markEntry = function (e) {
-					return _elm_lang$core$Native_Utils.eq(e.id, _p2._0) ? _elm_lang$core$Native_Utils.update(
-						e,
-						{marked: !e.marked}) : e;
-				};
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							entries: A2(_elm_lang$core$List$map, markEntry, model.entries)
+							entries: A2(_user$project$Entry$markEntryWithId, model.entries, _p2._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};

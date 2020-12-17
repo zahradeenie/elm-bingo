@@ -1,0 +1,30 @@
+var _user$project$Entry$markEntryWithId = F2(
+	function (entries, id) {
+		var markEntry = function (e) {
+			return _elm_lang$core$Native_Utils.eq(e.id, id) ? _elm_lang$core$Native_Utils.update(
+				e,
+				{marked: !e.marked}) : e;
+		};
+		return A2(_elm_lang$core$List$map, markEntry, entries);
+	});
+var _user$project$Entry$Entry = F4(
+	function (a, b, c, d) {
+		return {id: a, phrase: b, points: c, marked: d};
+	});
+var _user$project$Entry$entryDecoder = A5(
+	_elm_lang$core$Json_Decode$map4,
+	_user$project$Entry$Entry,
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'phrase', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'points', _elm_lang$core$Json_Decode$int),
+	_elm_lang$core$Json_Decode$succeed(false));
+var _user$project$Entry$getEntries = F2(
+	function (msg, url) {
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			A2(
+				_elm_lang$http$Http$get,
+				url,
+				_elm_lang$core$Json_Decode$list(_user$project$Entry$entryDecoder)));
+	});

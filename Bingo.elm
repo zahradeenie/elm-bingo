@@ -9,24 +9,17 @@ import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Encode as Encode
 
 import ViewHelpers exposing (..)
+import Entry
 
 -- MODEL
 
 type alias Model =
     { name : String
     , gameNumber : Int
-    , entries : List Entry
+    , entries : List Entry.Entry
     , alertMessage : Maybe String
     , nameInput : String
     , gameState : GameState
-    }
-
-
-type alias Entry = 
-    { id : Int
-    , phrase : String
-    , points : Int
-    , marked : Bool
     }
 
 
@@ -36,9 +29,11 @@ type alias Score =
     , score : Int
     }
 
+
 type GameState
     = EnteringName
     | Playing
+
 
 initialModel : Model
 initialModel =
@@ -57,7 +52,7 @@ type Msg
     = NewGame
     | Mark Int
     | Sort
-    | NewEntries (Result Http.Error (List Entry))
+    | NewEntries (Result Http.Error (List Entry.Entry))
     | CloseAlert
     | ShareScore
     | NewScore (Result Http.Error Score)
@@ -73,14 +68,7 @@ update  msg model =
             ( { model | gameNumber = model.gameNumber + 1 }, getEntries )
 
         Mark id ->
-            let
-                markEntry e =
-                    if e.id == id then
-                        { e | marked = (not e.marked) }
-                    else
-                        e
-            in
-                ( { model | entries = List.map markEntry model.entries }, Cmd.none )
+            ( { model | entries = Entry.markEntryWithId model.entries id }, Cmd.none )
 
         Sort ->
             ( { model | entries = List.sortBy .points model.entries}, Cmd.none )
@@ -141,15 +129,6 @@ httpErrorToMessage error =
 
 -- DECODERS / ENCODERS
 
-entryDecoder : Decoder Entry
-entryDecoder =
-    Decode.map4 Entry
-        (field "id" Decode.int)
-        (field "phrase" Decode.string)
-        (field "points" Decode.int)
-        (succeed False)
-
-
 scoreDecoder : Decoder Score
 scoreDecoder =
     Decode.map3 Score
@@ -168,16 +147,9 @@ encodeScore model =
 
 -- COMMANDS
 
-entriesUrl : String
-entriesUrl =
-    "http://localhost:3000/random-entries"
-
-
 getEntries : Cmd Msg
 getEntries =
-    (Decode.list entryDecoder)
-    |> Http.get entriesUrl
-    |> Http.send NewEntries
+    Entry.getEntries NewEntries "http://localhost:3000/random-entries"
 
 
 postUrl : String
@@ -221,7 +193,7 @@ viewFooter =
         [ H.a [ HA.href "https://github.com/zahradeenie" ] [ H.text "Made by Zahra" ] ]
 
 
-viewEntryItem : Entry -> H.Html Msg
+viewEntryItem : Entry.Entry -> H.Html Msg
 viewEntryItem entry =
     H.li [ HA.classList [ ("marked", entry.marked) ], onClick (Mark entry.id) ]
         [ H.span [ HA.class "phrase"] [ H.text entry.phrase ]
@@ -229,7 +201,7 @@ viewEntryItem entry =
         ]
 
 
-viewEntryList : List Entry -> H.Html Msg
+viewEntryList : List Entry.Entry -> H.Html Msg
 viewEntryList entries =
     let
         listOfEntries =
@@ -238,7 +210,7 @@ viewEntryList entries =
         H.ul [] listOfEntries
 
 
-sumMarkedPoints : List Entry -> Int
+sumMarkedPoints : List Entry.Entry -> Int
 sumMarkedPoints entries =
     entries
         |> List.filter .marked
