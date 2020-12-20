@@ -70,6 +70,22 @@ These three components are wired together with the Html.beginnerProgram fun whic
 
 ## Effects and Commands
 
+Elm doesn't allow side effects to take place inside functions so instead it uses commands that are sent to the Elm Runtime which handles all the dirty work so your functions can stay pure. You can define functions that takes a command and returns a message where youc an extract and use the data in the message in your functions. E.g. in the application, there's a function to post the score of the player to the server. It takes in the current model and returns a command message. All the function does is send a Http post request to the API endpoint we have setup in the server and returns a message that we can pattern match against in the update function.
+
+```elm
+postScore : Model -> Cmd Msg
+postScore model =
+    let
+        body =
+            encodeScore model
+                |> Http.jsonBody
+
+        request =
+            Http.post postUrl body scoreDecoder
+    in
+        Http.send NewScore request
+```
+
 ---
 
 ### Useful general knowledge
@@ -97,3 +113,15 @@ Output: "BINGO!BINGO!BINGO!"
 
 * `--warn` to show compiler warnings
 * `--debug` to show application state history
+
+
+### Notes and intsallation
+
+This project was built with Elm 0.18.0 which is referenced in the `.tool-versions` file. To run this locally, you need to use this version.
+
+- Install elm with asdf: `asdf plugin-add elm https://github.com/asdf-community/asdf-elm.git`
+- To install the necessary version run `asdf install` in the root directory
+- To start the dev server run `elm-live Bingo.elm --open --output=app.js`
+- The server that runs the API we call to in the app can be found in `./server`. To set up the API server, run:
+  - `cd server && npm install`
+  - `node server.js`
